@@ -6,8 +6,27 @@ const connectDB = require('./config/database');
 
 const app = express();
 
-// Connect to MongoDB
-connectDB();
+// Connect to MongoDB immediately
+let dbPromise;
+try {
+    dbPromise = connectDB();
+} catch (err) {
+    console.error("Initial DB connect error:", err);
+}
+
+// Middleware to ensure DB is connected before handling requests
+app.use(async (req, res, next) => {
+    try {
+        if (!dbPromise) {
+            dbPromise = connectDB();
+        }
+        await dbPromise;
+        next();
+    } catch (err) {
+        console.error('Database connection failed in middleware:', err);
+        res.status(500).json({ error: 'Database connection failed' });
+    }
+});
 
 // Middleware
 app.use(express.json());
@@ -50,9 +69,14 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Start server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
-});
+// Start server locally (ignored by Vercel)
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+        console.log(`🚀 Server running on port ${PORT}`);
+        console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
+    });
+}
+
+// Export the app for Vercel Serverless Functions
+module.exports = app;
