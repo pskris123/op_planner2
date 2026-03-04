@@ -1,18 +1,40 @@
 const mongoose = require('mongoose');
 
-const connectDB = async () => {
-    try {
-        const conn = await mongoose.connect(process.env.MONGODB_URI, {
-            // These options are no longer needed in Mongoose 6+
-            // but keeping them for compatibility
-        });
+let cached = global.mongoose;
 
-        console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-    } catch (error) {
-        console.error(`❌ Error connecting to MongoDB: ${error.message}`);
-        // Retry connection after 5 seconds
-        setTimeout(connectDB, 5000);
+if (!cached) {
+    cached = global.mongoose = { conn: null, promise: null };
+}
+
+const connectDB = async () => {
+    if (cached.conn) {
+        return cached.conn;
     }
+
+    if (!cached.promise) {
+        // Ensure uri is exactly a string 
+        const uri = String(process.env.MONGODB_URI);
+        const opts = {
+            bufferCommands: false,
+        };
+
+        cached.promise = mongoose.connect(uri, opts).then((mongoose) => {
+            console.log(`✅ MongoDB Connected`);
+            return mongoose;
+        }).catch(err => {
+            console.error(`❌ Error connecting to MongoDB: ${err.message}`);
+            throw err;
+        });
+    }
+
+    try {
+        cached.conn = await cached.promise;
+    } catch (e) {
+        cached.promise = null;
+        throw e;
+    }
+
+    return cached.conn;
 };
 
 module.exports = connectDB;
