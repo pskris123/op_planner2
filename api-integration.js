@@ -2,15 +2,15 @@
 const SUPABASE_URL = 'https://osbbvyprcjgoswpelfyi.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zYmJ2eXByY2pnb3N3cGVsZnlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1OTE2NDMsImV4cCI6MjA4ODE2NzY0M30.KM1KrE7j-XUs8RMhwLeCe5A6IbeQ-i1xSHt4CLa1FeY';
 
-const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
 // API Service Layer
 const API = {
     // Authentication
     async checkAuth() {
-        if (!supabase) return null;
+        if (!supabaseClient) return null;
         try {
-            const { data: { session }, error } = await supabase.auth.getSession();
+            const { data: { session }, error } = await supabaseClient.auth.getSession();
             if (error) throw error;
 
             if (session && session.user) {
@@ -32,9 +32,9 @@ const API = {
     },
 
     async logout() {
-        if (!supabase) return false;
+        if (!supabaseClient) return false;
         try {
-            const { error } = await supabase.auth.signOut();
+            const { error } = await supabaseClient.auth.signOut();
             if (error) throw error;
             return true;
         } catch (error) {
@@ -45,7 +45,7 @@ const API = {
 
     // Goals API
     async getGoals() {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseClient.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/goals`, {
             headers: {
                 'Authorization': `Bearer ${session?.access_token}`
@@ -56,7 +56,7 @@ const API = {
     },
 
     async createGoal(goalData) {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseClient.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/goals`, {
             method: 'POST',
             headers: {
@@ -70,7 +70,7 @@ const API = {
     },
 
     async updateGoal(goalId, updates) {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseClient.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/goals/${goalId}`, {
             method: 'PUT',
             headers: {
@@ -84,7 +84,7 @@ const API = {
     },
 
     async deleteGoal(goalId) {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseClient.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/goals/${goalId}`, {
             method: 'DELETE',
             headers: {
@@ -96,7 +96,7 @@ const API = {
     },
 
     async toggleStep(goalId, stepId, completed) {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseClient.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/goals/${goalId}/steps/${stepId}`, {
             method: 'PUT',
             headers: {
@@ -111,7 +111,7 @@ const API = {
 
     // Focus Tasks API
     async getFocusTasks() {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseClient.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/focus-tasks`, {
             headers: {
                 'Authorization': `Bearer ${session?.access_token}`
@@ -122,7 +122,7 @@ const API = {
     },
 
     async createFocusTask(taskData) {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseClient.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/focus-tasks`, {
             method: 'POST',
             headers: {
@@ -136,7 +136,7 @@ const API = {
     },
 
     async updateFocusTask(taskId, updates) {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseClient.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/focus-tasks/${taskId}`, {
             method: 'PUT',
             headers: {
@@ -150,7 +150,7 @@ const API = {
     },
 
     async deleteFocusTask(taskId) {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseClient.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/focus-tasks/${taskId}`, {
             method: 'DELETE',
             headers: {
@@ -163,7 +163,7 @@ const API = {
 
     // Events API
     async getEvents() {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseClient.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/events`, {
             headers: {
                 'Authorization': `Bearer ${session?.access_token}`
@@ -174,7 +174,7 @@ const API = {
     },
 
     async createEvents(eventsData) {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseClient.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/events`, {
             method: 'POST',
             headers: {
@@ -188,7 +188,7 @@ const API = {
     },
 
     async updateEvent(eventId, updates) {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseClient.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/events/${eventId}`, {
             method: 'PUT',
             headers: {
@@ -202,7 +202,7 @@ const API = {
     },
 
     async deleteEvent(eventId) {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseClient.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/events/${eventId}`, {
             method: 'DELETE',
             headers: {
@@ -215,7 +215,7 @@ const API = {
 
     // AI Suggestions
     async getAISuggestions() {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseClient.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/ai/suggestions`, {
             headers: {
                 'Authorization': `Bearer ${session?.access_token}`
@@ -226,7 +226,7 @@ const API = {
     },
 
     async refineGoal(title) {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseClient.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/ai/refine-goal`, {
             method: 'POST',
             headers: {
@@ -277,11 +277,11 @@ function showLoginButton() {
 
 // Event Listeners for Auth
 document.getElementById('login-btn').addEventListener('click', async () => {
-    if (!supabase) {
+    if (!supabaseClient) {
         alert('Authentication service is not initialized. Please check your configuration.');
         return;
     }
-    const { data, error } = await supabase.auth.signInWithOAuth({
+    const { data, error } = await supabaseClient.auth.signInWithOAuth({
         provider: 'google',
         options: {
             redirectTo: window.location.origin + window.location.pathname
