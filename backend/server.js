@@ -16,7 +16,7 @@ app.use(cookieParser());
 
 // CORS configuration
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: true, // Reflect request origin during temporary testing/deployment
     credentials: true
 }));
 

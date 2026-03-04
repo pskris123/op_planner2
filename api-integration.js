@@ -240,7 +240,10 @@ const API = {
     }
 };
 
-const API_BASE_URL = ''; // Keep relative for Vercel
+// Determine API Base URL based on environment
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:5000'
+    : '';
 
 // Authentication State Management
 let currentUser = null;
