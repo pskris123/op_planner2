@@ -14,20 +14,25 @@ const getGenAI = () => {
 
 // Helper to get or create user
 const getOrCreateUser = async (supabaseUser) => {
-    let user = await User.findOne({ supabaseId: supabaseUser.id });
-    if (!user) {
-        user = new User({
-            supabaseId: supabaseUser.id,
-            email: supabaseUser.email,
-            name: supabaseUser.user_metadata.full_name || supabaseUser.email,
-            picture: supabaseUser.user_metadata.avatar_url,
-            goals: [],
-            focusTasks: [],
-            events: []
-        });
-        await user.save();
+    try {
+        let user = await User.findOne({ supabaseId: supabaseUser.id });
+        if (!user) {
+            user = new User({
+                supabaseId: supabaseUser.id,
+                email: supabaseUser.email,
+                name: supabaseUser.user_metadata?.full_name || supabaseUser.email || 'Unknown User',
+                picture: supabaseUser.user_metadata?.avatar_url || '',
+                goals: [],
+                focusTasks: [],
+                events: []
+            });
+            await user.save();
+        }
+        return user;
+    } catch (err) {
+        console.error("getOrCreateUser error:", err);
+        throw err;
     }
-    return user;
 };
 
 // ============ GOALS API ============
@@ -246,6 +251,19 @@ router.put('/events/:id', async (req, res) => {
 
         await user.save();
         res.json(event);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// @route   DELETE /api/events/:id
+// @desc    Delete event
+router.delete('/events/:id', async (req, res) => {
+    try {
+        const user = await getOrCreateUser(req.user);
+        user.events.pull(req.params.id);
+        await user.save();
+        res.json({ message: 'Event deleted' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
