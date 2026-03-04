@@ -2,13 +2,20 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+// Connect to MongoDB
 const connectDB = require('./config/database');
 
 const app = express();
 
-// Connect to MongoDB immediately
-connectDB().catch(err => {
-    console.error("Initial DB connect error:", err);
+// Middleware to ensure DB is connected before handling requests
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (err) {
+        console.error('Database connection failed in middleware:', err);
+        res.status(500).json({ error: 'Database connection failed' });
+    }
 });
 
 // Middleware
