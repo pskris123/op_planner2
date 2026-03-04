@@ -20,6 +20,15 @@ app.use(cors({
     credentials: true
 }));
 
+// Add the debug route here before auth middleware
+app.get('/api/debug-env', (req, res) => {
+    res.json({
+        mongoUriType: typeof process.env.MONGODB_URI,
+        mongoUriExists: !!process.env.MONGODB_URI,
+        allKeys: Object.keys(process.env).filter(k => k.includes('MONGO') || k.includes('SUPA'))
+    });
+});
+
 // Routes
 const verifySupabaseToken = require('./middleware/supabaseAuth');
 app.use('/api', verifySupabaseToken, require('./routes/api'));
@@ -29,14 +38,6 @@ app.get('/', (req, res) => {
     res.json({
         message: 'Momentum API Server (Supabase Auth)',
         status: 'running'
-    });
-});
-
-app.get('/api/debug-env', (req, res) => {
-    res.json({
-        mongoUriType: typeof process.env.MONGODB_URI,
-        mongoUriExists: !!process.env.MONGODB_URI,
-        allKeys: Object.keys(process.env).filter(k => k.includes('MONGO') || k.includes('SUPA'))
     });
 });
 
