@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Momentum Unified App — Enhanced</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="auth-styles.css">
+    <!-- Supabase Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+    <div class="header-container">
+        <a href="#" class="logo-link">
+            <img src="https://i.ibb.co/4n3L09RV/generated-image.jpg" alt="Momentum App Logo" class="logo-img">
+            <span>Momentum</span>
+        </a>
+
+        <div class="right-header">
+            <nav class="main-nav">
+                <ul class="tabs">
+                    <li class="active" data-page="dashboard"><span>Dashboard</span></li>
+                    <li data-page="goals"><span>Goals</span></li>
+                    <li data-page="planner"><span>Planner</span></li>
+                </ul>
+            </nav>
+
+            <!-- Authentication UI -->
+            <div id="auth-container">
+                <div id="user-profile" style="display: none;">
+                    <img id="user-avatar" class="user-avatar" alt="User avatar">
+                    <span id="user-name"></span>
+                    <button id="logout-btn" class="small-btn" style="display: none;">Logout</button>
+                </div>
+                <button id="login-btn" class="primary" style="display: none;">🔐 Secure Sign In</button>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <section id="page-dashboard" class="page active">
+            <section id="mini-planner-container" class="dashboard-section"></section>
+
+            <section class="dashboard-section widgets">
+                <div class="widget">
+                    <h3>📋 Today's Focus</h3>
+                    <ul id="todays-focus-list"></ul>
+                    <label for="focusTaskInput">Add Focus Task</label>
+                    <input type="text" id="focusTaskInput" placeholder="Enter task title">
+                    <button class="primary" id="addFocusTaskBtn"><span>Add Task</span></button>
+                </div>
+
+                <div class="widget">
+                    <h3>⏰ Upcoming Deadlines</h3>
+                    <ul id="upcoming-deadlines-list"></ul>
+                </div>
+
+                <div class="widget">
+                    <h3>✨ AI Suggestions</h3>
+                    <p id="ai-suggestion-text">Loading productivity insights...</p>
+                    <button class="primary" id="schedule-btn" style="display: none;"><span>Schedule Now</span></button>
+                </div>
+            </section>
+        </section>
+
+        <section id="page-goals" class="page">
+            <button class="primary" id="add-goal-btn" style="margin-bottom:1.5rem;"><span>➕ Add New Goal</span></button>
+            <section class="dashboard-section">
+                <label for="goalTitleInput">Goal Title</label>
+                <input type="text" id="goalTitleInput" placeholder="Enter goal title">
+                <label for="goalStepsInput">Goal Steps (comma separated)</label>
+                <textarea id="goalStepsInput" rows="3" placeholder="Step1, Step2, Step3"></textarea>
+                <button class="primary" id="saveGoalBtn"><span>Save Goal</span></button>
+            </section>
+            <div id="goals-container"></div>
+        </section>
+
+        <section id="page-planner" class="page">
+            <div id="controls">
+                <label>
+                    Title
+                    <input type="text" id="title" placeholder="Event name">
+                </label>
+                <label>
+                    Day
+                    <select id="day">
+                        <option>Monday</option>
+                        <option>Tuesday</option>
+                        <option>Wednesday</option>
+                        <option>Thursday</option>
+                        <option>Friday</option>
+                        <option>Saturday</option>
+                        <option>Sunday</option>
+                    </select>
+                </label>
+                <label>
+                    From
+                    <input type="time" id="from">
+                </label>
+                <label>
+                    To
+                    <input type="time" id="to">
+                </label>
+                <label>
+                    Priority
+                    <select id="priority">
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </label>
+                <div id="frequency-section">
+                    <label>
+                        Frequency
+                        <select id="frequency">
+                            <option value="once">One-time</option>
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="weekdays">Weekdays Only</option>
+                            <option value="weekends">Weekends Only</option>
+                            <option value="custom">Custom Days</option>
+                        </select>
+                    </label>
+                    <div id="frequency-options">
+                        <label>
+                            Repeat for
+                            <input type="number" id="repeat-count" value="4" min="1" max="52">
+                        </label>
+                        <label style="font-size:0.8rem;">
+                            <input type="checkbox" id="mon"> Mon
+                        </label>
+                        <label style="font-size:0.8rem;">
+                            <input type="checkbox" id="tue"> Tue
+                        </label>
+                        <label style="font-size:0.8rem;">
+                            <input type="checkbox" id="wed"> Wed
+                        </label>
+                        <label style="font-size:0.8rem;">
+                            <input type="checkbox" id="thu"> Thu
+                        </label>
+                        <label style="font-size:0.8rem;">
+                            <input type="checkbox" id="fri"> Fri
+                        </label>
+                        <label style="font-size:0.8rem;">
+                            <input type="checkbox" id="sat"> Sat
+                        </label>
+                        <label style="font-size:0.8rem;">
+                            <input type="checkbox" id="sun"> Sun
+                        </label>
+                    </div>
+                </div>
+                <button id="addBtn"><span>Add Event</span></button>
+            </div>
+            <div class="planner-controls">
+                <button id="togglePastBtn" class="small-btn">👁️ Show Past Times</button>
+            </div>
+            <div id="planner-container">
+                <div id="planner"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- API Integration Scripts (load before main script) -->
+    <script src="api-integration.js"></script>
+    <script src="api-render.js"></script>
+
+    <!-- Original script (for planner rendering and other utilities) -->
+    <script src="script.js"></script>
+
+    <!-- Mobile Navigation Bar -->
+    <div class="mobile-nav">
+        <div class="mobile-nav-item active" data-page="dashboard">
+            <span class="nav-icon">📊</span>
+            <span>Home</span>
+        </div>
+        <div class="mobile-nav-item" data-page="goals">
+            <span class="nav-icon">🎯</span>
+            <span>Goals</span>
+        </div>
+        <div class="mobile-nav-item" data-page="planner">
+            <span class="nav-icon">📅</span>
+            <span>Planner</span>
+        </div>
+    </div>
+</body>
+
+</html>

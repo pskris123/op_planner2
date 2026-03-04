@@ -1,0 +1,57 @@
+/* Authentication UI */
+#auth-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+#user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+#user-profile:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--primary);
+}
+
+.user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid var(--primary);
+    box-shadow: var(--shadow-md);
+}
+
+#user-name {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+#login-btn {
+    white-space: nowrap;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .header-container {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    #auth-container {
+        width: 100%;
+        justify-content: center;
+    }
+
+    #user-name {
+        display: none;
+    }
+}
