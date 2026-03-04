@@ -7,25 +7,8 @@ const connectDB = require('./config/database');
 const app = express();
 
 // Connect to MongoDB immediately
-let dbPromise;
-try {
-    dbPromise = connectDB();
-} catch (err) {
+connectDB().catch(err => {
     console.error("Initial DB connect error:", err);
-}
-
-// Middleware to ensure DB is connected before handling requests
-app.use(async (req, res, next) => {
-    try {
-        if (!dbPromise) {
-            dbPromise = connectDB();
-        }
-        await dbPromise;
-        next();
-    } catch (err) {
-        console.error('Database connection failed in middleware:', err);
-        res.status(500).json({ error: 'Database connection failed' });
-    }
 });
 
 // Middleware
