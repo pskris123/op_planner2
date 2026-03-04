@@ -31,6 +31,6 @@
     ],
     "env": {
         "NODE_ENV": "production",
-        "IGNORE_AUTH": "true"
+        "IGNORE_AUTH": "false"
     }
 }

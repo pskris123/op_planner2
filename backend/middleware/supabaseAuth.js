@@ -7,19 +7,6 @@ const supabase = isSupabaseConfigured
     : null;
 
 const verifySupabaseToken = async (req, res, next) => {
-    // TEMPORARY: Bypass auth for Vercel deployment if IGNORE_AUTH is set
-    if (process.env.IGNORE_AUTH === 'true') {
-        req.user = {
-            id: 'guest_user_id',
-            email: 'guest@momentum.app',
-            user_metadata: {
-                full_name: 'Guest User',
-                avatar_url: 'https://i.ibb.co/4n3L09RV/generated-image.jpg'
-            }
-        };
-        return next();
-    }
-
     if (!supabase) {
         console.warn('⚠️ Supabase Auth is not configured. Authentication will fail.');
         return res.status(503).json({ error: 'Authentication service not configured' });

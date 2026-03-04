@@ -1,34 +1,67 @@
+// Supabase Configuration (Placeholder values - update with your actual project details)
+const SUPABASE_URL = 'https://osbbvyprcjgoswpelfyi.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zYmJ2eXByY2pnb3N3cGVsZnlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1OTE2NDMsImV4cCI6MjA4ODE2NzY0M30.KM1KrE7j-XUs8RMhwLeCe5A6IbeQ-i1xSHt4CLa1FeY';
+
+const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
 // API Service Layer
 const API = {
     // Authentication
     async checkAuth() {
-        // Return a mock guest user for simplified deployment
-        return {
-            user: {
-                id: 'guest_user_id',
-                name: 'Guest User',
-                email: 'guest@momentum.app',
-                picture: 'https://i.ibb.co/4n3L09RV/generated-image.jpg'
+        if (!supabase) return null;
+        try {
+            const { data: { session }, error } = await supabase.auth.getSession();
+            if (error) throw error;
+
+            if (session && session.user) {
+                // Map Supabase user to the format expected by the app
+                return {
+                    user: {
+                        id: session.user.id,
+                        name: session.user.user_metadata.full_name || session.user.email,
+                        email: session.user.email,
+                        picture: session.user.user_metadata.avatar_url || 'https://i.ibb.co/4n3L09RV/generated-image.jpg'
+                    }
+                };
             }
-        };
+            return null;
+        } catch (error) {
+            console.error('Auth check failed:', error);
+            return null;
+        }
     },
 
     async logout() {
-        return true;
+        if (!supabase) return false;
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error) throw error;
+            return true;
+        } catch (error) {
+            console.error('Logout failed:', error);
+            return false;
+        }
     },
 
     // Goals API
     async getGoals() {
-        const response = await fetch(`${API_BASE_URL}/api/goals`);
+        const { data: { session } } = await supabase.auth.getSession();
+        const response = await fetch(`${API_BASE_URL}/api/goals`, {
+            headers: {
+                'Authorization': `Bearer ${session?.access_token}`
+            }
+        });
         if (!response.ok) throw new Error('Failed to fetch goals');
         return await response.json();
     },
 
     async createGoal(goalData) {
+        const { data: { session } } = await supabase.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/goals`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session?.access_token}`
             },
             body: JSON.stringify(goalData)
         });
@@ -37,10 +70,12 @@ const API = {
     },
 
     async updateGoal(goalId, updates) {
+        const { data: { session } } = await supabase.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/goals/${goalId}`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session?.access_token}`
             },
             body: JSON.stringify(updates)
         });
@@ -49,18 +84,24 @@ const API = {
     },
 
     async deleteGoal(goalId) {
+        const { data: { session } } = await supabase.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/goals/${goalId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${session?.access_token}`
+            }
         });
         if (!response.ok) throw new Error('Failed to delete goal');
         return await response.json();
     },
 
     async toggleStep(goalId, stepId, completed) {
+        const { data: { session } } = await supabase.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/goals/${goalId}/steps/${stepId}`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session?.access_token}`
             },
             body: JSON.stringify({ completed })
         });
@@ -70,16 +111,23 @@ const API = {
 
     // Focus Tasks API
     async getFocusTasks() {
-        const response = await fetch(`${API_BASE_URL}/api/focus-tasks`);
+        const { data: { session } } = await supabase.auth.getSession();
+        const response = await fetch(`${API_BASE_URL}/api/focus-tasks`, {
+            headers: {
+                'Authorization': `Bearer ${session?.access_token}`
+            }
+        });
         if (!response.ok) throw new Error('Failed to fetch focus tasks');
         return await response.json();
     },
 
     async createFocusTask(taskData) {
+        const { data: { session } } = await supabase.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/focus-tasks`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session?.access_token}`
             },
             body: JSON.stringify(taskData)
         });
@@ -88,10 +136,12 @@ const API = {
     },
 
     async updateFocusTask(taskId, updates) {
+        const { data: { session } } = await supabase.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/focus-tasks/${taskId}`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session?.access_token}`
             },
             body: JSON.stringify(updates)
         });
@@ -100,8 +150,12 @@ const API = {
     },
 
     async deleteFocusTask(taskId) {
+        const { data: { session } } = await supabase.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/focus-tasks/${taskId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${session?.access_token}`
+            }
         });
         if (!response.ok) throw new Error('Failed to delete focus task');
         return await response.json();
@@ -109,16 +163,23 @@ const API = {
 
     // Events API
     async getEvents() {
-        const response = await fetch(`${API_BASE_URL}/api/events`);
+        const { data: { session } } = await supabase.auth.getSession();
+        const response = await fetch(`${API_BASE_URL}/api/events`, {
+            headers: {
+                'Authorization': `Bearer ${session?.access_token}`
+            }
+        });
         if (!response.ok) throw new Error('Failed to fetch events');
         return await response.json();
     },
 
     async createEvents(eventsData) {
+        const { data: { session } } = await supabase.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/events`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session?.access_token}`
             },
             body: JSON.stringify(eventsData)
         });
@@ -127,10 +188,12 @@ const API = {
     },
 
     async updateEvent(eventId, updates) {
+        const { data: { session } } = await supabase.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/events/${eventId}`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session?.access_token}`
             },
             body: JSON.stringify(updates)
         });
@@ -139,8 +202,12 @@ const API = {
     },
 
     async deleteEvent(eventId) {
+        const { data: { session } } = await supabase.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/events/${eventId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${session?.access_token}`
+            }
         });
         if (!response.ok) throw new Error('Failed to delete event');
         return await response.json();
@@ -148,16 +215,23 @@ const API = {
 
     // AI Suggestions
     async getAISuggestions() {
-        const response = await fetch(`${API_BASE_URL}/api/ai/suggestions`);
+        const { data: { session } } = await supabase.auth.getSession();
+        const response = await fetch(`${API_BASE_URL}/api/ai/suggestions`, {
+            headers: {
+                'Authorization': `Bearer ${session?.access_token}`
+            }
+        });
         if (!response.ok) throw new Error('Failed to fetch AI suggestions');
         return await response.json();
     },
 
     async refineGoal(title) {
+        const { data: { session } } = await supabase.auth.getSession();
         const response = await fetch(`${API_BASE_URL}/api/ai/refine-goal`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session?.access_token}`
             },
             body: JSON.stringify({ title })
         });
@@ -166,7 +240,7 @@ const API = {
     }
 };
 
-const API_BASE_URL = ''; // Relative for Vercel deployment
+const API_BASE_URL = ''; // Keep relative for Vercel
 
 // Authentication State Management
 let currentUser = null;
@@ -190,20 +264,27 @@ function showUserProfile(user) {
     document.getElementById('user-profile').style.display = 'flex';
     document.getElementById('user-avatar').src = user.picture;
     document.getElementById('user-name').textContent = user.name;
-    document.getElementById('logout-btn').style.display = 'none'; // Hide logout in guest mode
+    document.getElementById('logout-btn').style.display = 'block'; // Show logout again
 }
 
 function showLoginButton() {
     document.getElementById('user-profile').style.display = 'none';
-    document.getElementById('login-btn').style.display = 'none'; // Hide login button as well
-    // Directly init as guest if auth check fails for some reason
-    initAuth();
+    document.getElementById('login-btn').style.display = 'block';
 }
 
 // Event Listeners for Auth
 document.getElementById('login-btn').addEventListener('click', async () => {
-    // Disabled for Vercel deployment
-    console.log('Login disabled');
+    if (!supabase) {
+        alert('Authentication service is not initialized. Please check your configuration.');
+        return;
+    }
+    const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+            redirectTo: window.location.origin + window.location.pathname
+        }
+    });
+    if (error) console.error('Login failed:', error.message);
 });
 
 document.getElementById('logout-btn').addEventListener('click', async () => {
