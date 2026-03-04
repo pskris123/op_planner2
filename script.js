@@ -509,13 +509,7 @@ function createRecurringEvents(baseEvent) {
     return recurringEvents;
 }
 
-document.getElementById('addBtn').onclick = () => {
-    // If user is authenticated, api-render.js handles the click via addEventListener.
-    // We only proceed here for local storage if NOT authenticated.
-    if (window.isUserAuthenticated && window.isUserAuthenticated()) {
-        console.log('Handled by api-render.js (authenticated)');
-        return;
-    }
+document.getElementById('addBtn').onclick = async () => {
     const title = document.getElementById('title').value.trim();
     const day = document.getElementById('day').value;
     const from = document.getElementById('from').value;
@@ -546,6 +540,22 @@ document.getElementById('addBtn').onclick = () => {
     };
 
     const newEvents = createRecurringEvents(baseEvent);
+
+    if (window.isUserAuthenticated && window.isUserAuthenticated()) {
+        try {
+            await window.MomentumAPI.createEvents(newEvents);
+            document.getElementById('title').value = '';
+            document.getElementById('from').value = '';
+            document.getElementById('to').value = '';
+            document.getElementById('frequency').value = 'once';
+            document.getElementById('frequency-options').classList.remove('show');
+            if (window.reloadData) await window.reloadData();
+        } catch (error) {
+            alert('Failed to create event: ' + error.message);
+        }
+        return;
+    }
+
     events.push(...newEvents);
     saveData(STORAGE_KEYS.EVENTS, events);
 

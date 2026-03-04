@@ -120,33 +120,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const addEventBtn = document.getElementById('addBtn');
-    if (addEventBtn) {
-        addEventBtn.addEventListener('click', async (e) => {
-            if (!window.isUserAuthenticated()) return;
-            e.stopImmediatePropagation();
-
-            const title = document.getElementById('title').value.trim();
-            const day = document.getElementById('day').value;
-            const from = document.getElementById('from').value;
-            const to = document.getElementById('to').value;
-            const priority = document.getElementById('priority').value;
-            const frequency = document.getElementById('frequency').value;
-
-            if (!title || !from || !to) {
-                alert('Please fill in all required fields');
-                return;
-            }
-
-            try {
-                await window.MomentumAPI.createEvents({ title, day, from, to, priority, frequency });
-                document.getElementById('title').value = '';
-                document.getElementById('from').value = '';
-                document.getElementById('to').value = '';
-                await window.reloadData();
-            } catch (error) {
-                alert('Failed to create event: ' + error.message);
-            }
-        });
-    }
 });
