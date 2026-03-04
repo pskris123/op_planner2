@@ -38,6 +38,50 @@ app.get('/api/debug-env', (req, res) => {
     });
 });
 
+// Full diagnostic endpoint - tests auth + DB together
+app.get('/api/test-auth-db', async (req, res) => {
+    const results = { steps: [] };
+    try {
+        // Step 1: Check env vars
+        results.steps.push({ step: 'env', supabaseUrl: !!process.env.SUPABASE_URL, supabaseKey: !!process.env.SUPABASE_ANON_KEY, mongoUri: !!process.env.MONGODB_URI });
+
+        // Step 2: Check auth header
+        const authHeader = req.headers.authorization;
+        results.steps.push({ step: 'authHeader', exists: !!authHeader, value: authHeader ? authHeader.substring(0, 20) + '...' : null });
+
+        // Step 3: Test Supabase
+        const { createClient } = require('@supabase/supabase-js');
+        const supa = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+        results.steps.push({ step: 'supabaseClient', created: true });
+
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            const token = authHeader.split(' ')[1];
+            try {
+                const { data, error } = await supa.auth.getUser(token);
+                results.steps.push({ step: 'supabaseGetUser', success: !error, userId: data?.user?.id, error: error?.message });
+            } catch (e) {
+                results.steps.push({ step: 'supabaseGetUser', success: false, error: e.message });
+            }
+        }
+
+        // Step 4: Test MongoDB
+        const mongoose = require('mongoose');
+        results.steps.push({ step: 'mongooseState', readyState: mongoose.connection.readyState });
+
+        try {
+            await connectDB();
+            results.steps.push({ step: 'connectDB', success: true, readyState: mongoose.connection.readyState });
+        } catch (e) {
+            results.steps.push({ step: 'connectDB', success: false, error: e.message });
+        }
+
+        res.json(results);
+    } catch (e) {
+        results.steps.push({ step: 'fatal', error: e.message, stack: e.stack });
+        res.status(500).json(results);
+    }
+});
+
 // Routes
 const verifySupabaseToken = require('./middleware/supabaseAuth');
 app.use('/api', verifySupabaseToken, require('./routes/api'));
