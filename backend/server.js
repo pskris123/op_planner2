@@ -32,6 +32,14 @@ app.get('/', (req, res) => {
     });
 });
 
+app.get('/api/debug-env', (req, res) => {
+    res.json({
+        mongoUriType: typeof process.env.MONGODB_URI,
+        mongoUriExists: !!process.env.MONGODB_URI,
+        allKeys: Object.keys(process.env).filter(k => k.includes('MONGO') || k.includes('SUPA'))
+    });
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
