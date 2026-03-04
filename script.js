@@ -467,7 +467,7 @@ function renderPlanner(data) {
             }
         };
         eventDiv.appendChild(deleteBtn);
-        startSlot.appendChild(eventDiv);
+        drawSlot.appendChild(eventDiv);
     });
 }
 
