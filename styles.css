@@ -15,12 +15,7 @@
     --primary: var(--accent);
     --primary-light: #4A4540;
 
-    /* Borders instead of shadows */
-    --shadow-glass: none;
-    --glass-border: 1px solid var(--border-color);
-    --glass-blur: none;
-    
-    /* Box Shadows (mostly removed, but keeping variables for structure) */
+    /* Box Shadows */
     --shadow-sm: none;
     --shadow-md: 0 4px 12px rgba(26, 24, 20, 0.05); /* Very subtle if needed at all */
     --shadow-lg: 0 8px 24px rgba(26, 24, 20, 0.08);
@@ -219,7 +214,7 @@ main {
 
 .dashboard-section {
     background: var(--bg-card);
-    border: var(--glass-border);
+    border: 1px solid var(--border-color);
     border-radius: 18px; /* More aggressive corners */
     padding: 2.5rem;
     margin-bottom: 2rem;
@@ -249,7 +244,7 @@ main {
 
 .widget {
     background: var(--bg-card);
-    border: var(--glass-border);
+    border: 1px solid var(--border-color);
     border-radius: 18px;
     padding: 2rem;
     box-shadow: var(--shadow-sm); /* Flat */
@@ -480,7 +475,7 @@ ul li:last-child {
 /* Goals */
 .goal {
     background: var(--bg-card);
-    border: var(--glass-border);
+    border: 1px solid var(--border-color);
     border-radius: 18px;
     box-shadow: var(--shadow-sm); /* Flat */
     padding: 2.5rem;
@@ -677,7 +672,7 @@ ul li:last-child {
     background: var(--text-primary);
     color: var(--bg-primary);
     border: none;
-    border-radius: 4px;
+    border-radius: 18px;
     cursor: pointer;
     font-weight: 500;
     height: fit-content;
@@ -753,7 +748,7 @@ ul li:last-child {
 /* Calendar Planner */
 #planner-container {
     background: var(--bg-card);
-    border: var(--glass-border);
+    border: 1px solid var(--border-color);
     border-radius: 18px;
     box-shadow: var(--shadow-sm);
     overflow: auto;
@@ -1000,7 +995,7 @@ ul li:last-child {
     justify-content: center;
     font-weight: bold;
     transition: all 0.2s ease;
-    backdrop-filter: blur(10px);
+    /* backdrop-filter removed */
 }
 
 .event button:hover {
@@ -1123,7 +1118,7 @@ ul li:last-child {
     .header-container {
         padding: 0.8rem 1.5rem;
         background: var(--bg-card);
-        backdrop-filter: none;
+
     }
 
     .main-nav,
