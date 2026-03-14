@@ -445,7 +445,7 @@ ul li {
 }
 
 ul li:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--hover-state);
 }
 
 ul li:last-child {
@@ -920,7 +920,7 @@ ul li:last-child {
 }
 
 .slot:hover {
-    background: rgba(255, 255, 255, 0.06);
+    background: var(--hover-state);
 }
 
 /* Events */
@@ -929,13 +929,13 @@ ul li:last-child {
     position: absolute;
     left: 4px;
     right: 4px;
-    border-radius: 4px; /* Less rounded */
+    border-radius: 12px;
     padding: 8px 12px;
-    color: var(--bg-primary); /* Dark theme was white, light theme needs dark/light contrast */
+    color: var(--bg-primary);
     font-size: 0.85rem;
     font-weight: 500;
     border: 1px solid transparent;
-    box-shadow: none;
+    box-shadow: 0 2px 8px rgba(26, 24, 20, 0.1);
     transition: all 0.2s ease;
     z-index: 10;
     display: flex;
@@ -945,7 +945,7 @@ ul li:last-child {
 .event:hover {
     transform: translateY(-1px);
     z-index: 50;
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 4px 16px rgba(26, 24, 20, 0.15);
 }
 
 .event.high {
@@ -959,9 +959,9 @@ ul li:last-child {
 }
 
 .event.low {
-    background: var(--border-color);
+    background: var(--hover-state);
     color: var(--text-primary);
-    border: 1px solid var(--text-secondary);
+    border: 1px solid var(--border-color);
 }
 
 .event-content {
@@ -980,8 +980,8 @@ ul li:last-child {
 }
 
 .event button {
-    background: rgba(255, 255, 255, 0.2);
-    color: #fff;
+    background: rgba(255, 255, 255, 0.25);
+    color: inherit;
     border: none;
     border-radius: 50%;
     font-size: 0.9rem;
@@ -995,12 +995,20 @@ ul li:last-child {
     justify-content: center;
     font-weight: bold;
     transition: all 0.2s ease;
-    /* backdrop-filter removed */
 }
 
 .event button:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.4);
     transform: scale(1.15);
+}
+
+.event.low button {
+    background: rgba(26, 24, 20, 0.1);
+    color: var(--text-primary);
+}
+
+.event.low button:hover {
+    background: rgba(26, 24, 20, 0.2);
 }
 
 .recurring-indicator {
