@@ -8,35 +8,55 @@
 #user-profile {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 8px 16px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
+    position: relative; /* Base for dropdown */
+    cursor: pointer;
+    background: transparent;
+    border: none;
     transition: all 0.3s ease;
-}
-
-#user-profile:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: var(--primary);
 }
 
 .user-avatar {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    border: 2px solid var(--primary);
-    box-shadow: var(--shadow-md);
+    border: 2px solid var(--text-primary);
+    box-shadow: none;
+    transition: transform 0.2s ease;
+}
+
+#user-profile:hover .user-avatar {
+    transform: scale(1.05);
 }
 
 #user-name {
-    color: var(--text-primary);
-    font-weight: 600;
-    font-size: 0.95rem;
+    display: none; /* Hide username */
 }
 
-#login-btn {
+/* Logout Button as Dropdown */
+#logout-btn {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(26, 24, 20, 0.1);
+    color: var(--text-primary);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    padding: 8px 12px;
+    z-index: 1001;
     white-space: nowrap;
+}
+
+#logout-btn:hover {
+    background: var(--hover-state);
+}
+
+#user-profile.show-logout #logout-btn {
+    display: flex;
 }
 
 /* Responsive adjustments */
@@ -49,9 +69,5 @@
     #auth-container {
         width: 100%;
         justify-content: center;
-    }
-
-    #user-name {
-        display: none;
     }
 }

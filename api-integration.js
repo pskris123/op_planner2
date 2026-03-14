@@ -267,7 +267,7 @@ function showUserProfile(user) {
     document.getElementById('user-profile').style.display = 'flex';
     document.getElementById('user-avatar').src = user.picture;
     document.getElementById('user-name').textContent = user.name;
-    document.getElementById('logout-btn').style.display = 'block'; // Show logout again
+    // CSS handles logout-btn display via .show-logout class
 }
 
 function showLoginButton() {
@@ -296,10 +296,25 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
         currentUser = null;
         isAuthenticated = false;
         showLoginButton();
+        document.getElementById('user-profile').classList.remove('show-logout');
         // Clear UI
         document.getElementById('goals-container').innerHTML = '';
         document.getElementById('todays-focus-list').innerHTML = '';
         document.getElementById('planner').innerHTML = '';
+    }
+});
+
+// Profile Icon Dropdown Toggle
+document.getElementById('user-avatar').addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.getElementById('user-profile').classList.toggle('show-logout');
+});
+
+// Close dropdown on outside click
+document.addEventListener('click', (e) => {
+    const profile = document.getElementById('user-profile');
+    if (profile && profile.classList.contains('show-logout') && !profile.contains(e.target)) {
+        profile.classList.remove('show-logout');
     }
 });
 

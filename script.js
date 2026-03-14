@@ -35,7 +35,7 @@ function createMiniPlanner() {
     const container = document.createElement('div');
 
     const title = document.createElement('h2');
-    title.textContent = '📅 Weekly Overview';
+    title.textContent = 'Weekly Overview';
     title.style.marginBottom = '1.5rem';
     container.appendChild(title);
 
@@ -50,13 +50,15 @@ function createMiniPlanner() {
     DAYS.forEach(day => {
         const dayHeader = document.createElement('div');
         dayHeader.textContent = day.substring(0, 3);
-        dayHeader.style.fontWeight = '700';
+        dayHeader.style.fontFamily = "'JetBrains Mono', 'IBM Plex Mono', monospace";
+        dayHeader.style.fontWeight = '600';
         dayHeader.style.textAlign = 'center';
-        dayHeader.style.color = '#f1f5f9';
+        dayHeader.style.color = '#1A1814'; // Near black
         dayHeader.style.padding = '8px';
-        dayHeader.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-        dayHeader.style.border = '1px solid rgba(255, 255, 255, 0.1)';
-        dayHeader.style.borderRadius = '8px';
+        dayHeader.style.background = '#FAFAF7'; // Off-white
+        dayHeader.style.border = '1px solid #D9D3C7'; // Warm gray
+        dayHeader.style.borderRadius = '4px';
+        dayHeader.style.textTransform = 'uppercase';
         plannerGrid.appendChild(dayHeader);
     });
 
@@ -66,22 +68,24 @@ function createMiniPlanner() {
         // Time label
         const timeLabel = document.createElement('div');
         timeLabel.textContent = `${hour}:00`;
+        timeLabel.style.fontFamily = "'JetBrains Mono', 'IBM Plex Mono', monospace";
         timeLabel.style.fontWeight = '600';
-        timeLabel.style.color = '#cbd5e1';
-        timeLabel.style.textAlign = 'center';
+        timeLabel.style.color = '#7A7468';
+        timeLabel.style.textAlign = 'right';
         timeLabel.style.padding = '6px';
-        timeLabel.style.background = 'rgba(255, 255, 255, 0.05)';
-        timeLabel.style.border = '1px solid rgba(255, 255, 255, 0.1)';
-        timeLabel.style.borderRadius = '6px';
+        timeLabel.style.background = 'transparent';
+        timeLabel.style.border = 'none';
+        timeLabel.style.borderRight = '1px solid #D9D3C7';
+        timeLabel.style.borderRadius = '0';
         plannerGrid.appendChild(timeLabel);
 
         // Day slots for this hour
         DAYS.forEach(day => {
             const slot = document.createElement('div');
             slot.style.minHeight = '30px';
-            slot.style.background = 'rgba(255, 255, 255, 0.02)';
-            slot.style.border = '1px solid rgba(255, 255, 255, 0.1)';
-            slot.style.borderRadius = '8px';
+            slot.style.background = 'transparent';
+            slot.style.borderBottom = '1px solid #D9D3C7';
+            slot.style.borderRadius = '0';
             slot.style.padding = '4px 8px';
             slot.style.overflow = 'hidden';
             slot.style.whiteSpace = 'nowrap';
@@ -95,19 +99,21 @@ function createMiniPlanner() {
                 slot.textContent = event.title;
                 slot.title = event.title; // Tooltip on hover
                 slot.style.fontWeight = '500';
-                slot.style.color = 'white';
+                slot.style.color = '#FAFAF7';
 
                 // Style based on priority
                 if (event.priority === 'high') {
-                    slot.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
-                    slot.style.boxShadow = '0 2px 4px rgba(239, 68, 68, 0.3)';
+                    slot.style.background = '#1A1814'; // Near black
+                    slot.style.boxShadow = 'none';
                 } else if (event.priority === 'medium') {
-                    slot.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
-                    slot.style.color = '#fff';
-                    slot.style.boxShadow = '0 2px 4px rgba(245, 158, 11, 0.3)';
+                    slot.style.background = '#7A7468'; // Medium warm gray
+                    slot.style.color = '#FAFAF7';
+                    slot.style.boxShadow = 'none';
                 } else {
-                    slot.style.background = 'linear-gradient(135deg, #6366f1, #4f46e5)';
-                    slot.style.boxShadow = '0 2px 4px rgba(99, 102, 241, 0.3)';
+                    slot.style.background = '#D9D3C7'; // Warm gray border color
+                    slot.style.color = '#1A1814';
+                    slot.style.border = '1px solid #7A7468';
+                    slot.style.boxShadow = 'none';
                 }
             }
             plannerGrid.appendChild(slot);
@@ -131,6 +137,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const tabs = document.querySelectorAll('.tabs li');
     const mobileTabs = document.querySelectorAll('.mobile-nav-item');
     const pages = document.querySelectorAll('.page');
+    const logoLink = document.querySelector('.logo-link');
 
     function switchPage(pageId) {
         // Sync Pages
@@ -166,6 +173,13 @@ document.addEventListener('DOMContentLoaded', function () {
             switchPage(this.getAttribute('data-page'));
         });
     });
+
+    if (logoLink) {
+        logoLink.addEventListener('click', function (e) {
+            e.preventDefault(); // Prevent default link behavior
+            switchPage('dashboard');
+        });
+    }
 });
 
 /* --- Enhanced Calendar Integration --- */
@@ -766,7 +780,7 @@ function renderGoals(data) {
 
         const refineGoalBtn = document.createElement('button');
         refineGoalBtn.className = 'small-btn';
-        refineGoalBtn.innerHTML = '✨ AI Refine';
+        refineGoalBtn.innerHTML = 'AI Refine';
         refineGoalBtn.title = 'Use AI to break this goal into steps';
         refineGoalBtn.addEventListener('click', async () => {
             refineGoalBtn.textContent = 'Refining...';
@@ -798,7 +812,7 @@ function renderGoals(data) {
             } catch (error) {
                 alert('Refinement failed: ' + error.message);
             } finally {
-                refineGoalBtn.innerHTML = '✨ AI Refine';
+                refineGoalBtn.innerHTML = 'AI Refine';
             }
         });
 
@@ -1113,7 +1127,7 @@ window.scrollToCurrentTime = scrollToCurrentTime;
     if (toggleBtn) {
         toggleBtn.addEventListener('click', function () {
             showPastTimes = !showPastTimes;
-            this.textContent = showPastTimes ? '👁️ Hide Past Times' : '👁️ Show Past Times';
+            this.textContent = showPastTimes ? 'Hide Past Times' : 'Show Past Times';
             renderPlanner();
             if (showPastTimes) {
                 // If showing, scroll back to where we were
