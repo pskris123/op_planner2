@@ -42,7 +42,6 @@ window.updateEventFromAPI = async (eventId, updates) => {
 };
 
 window.deleteEventFromAPI = async (eventId) => {
-    if (!confirm('Delete this event?')) return;
     try {
         await window.MomentumAPI.deleteEvent(eventId);
         await window.reloadData();
@@ -61,7 +60,6 @@ window.updateFocusTaskFromAPI = async (taskId, updates) => {
 };
 
 window.deleteFocusTaskFromAPI = async (taskId) => {
-    if (!confirm('Delete this focus task?')) return;
     try {
         await window.MomentumAPI.deleteFocusTask(taskId);
         await window.reloadData();
