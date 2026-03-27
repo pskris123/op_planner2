@@ -612,9 +612,16 @@ function renderFocusTasks(data) {
         const edit = document.createElement('button');
         edit.className = 'small-btn';
         edit.textContent = 'Edit';
-        edit.addEventListener('click', () => {
+        edit.addEventListener('click', async () => {
             const newTitle = prompt('Edit task title', task.title);
             if (newTitle !== null && newTitle.trim()) {
+                if (window.isUserAuthenticated && window.isUserAuthenticated()) {
+                    try {
+                        await window.MomentumAPI.updateFocusTask(task._id, { title: newTitle.trim() });
+                        await window.reloadData();
+                    } catch (err) { alert('Failed to edit task: ' + err.message); }
+                    return;
+                }
                 tasks[idx].title = newTitle.trim();
                 saveData(STORAGE_KEYS.FOCUS_TASKS, tasks);
                 renderFocusTasks();
@@ -625,13 +632,19 @@ function renderFocusTasks(data) {
         const del = document.createElement('button');
         del.className = 'small-btn';
         del.textContent = 'Delete';
-        del.addEventListener('click', () => {
-            if (confirm('Delete this focus task?')) {
-                tasks.splice(idx, 1);
-                saveData(STORAGE_KEYS.FOCUS_TASKS, tasks);
-                renderFocusTasks();
-                updateDashboardWidgets();
+        del.addEventListener('click', async () => {
+            if (!confirm('Delete this focus task?')) return;
+            if (window.isUserAuthenticated && window.isUserAuthenticated()) {
+                try {
+                    await window.MomentumAPI.deleteFocusTask(task._id);
+                    await window.reloadData();
+                } catch (err) { alert('Failed to delete task: ' + err.message); }
+                return;
             }
+            tasks.splice(idx, 1);
+            saveData(STORAGE_KEYS.FOCUS_TASKS, tasks);
+            renderFocusTasks();
+            updateDashboardWidgets();
         });
 
         controls.appendChild(edit);
@@ -716,7 +729,14 @@ function renderGoals(data) {
             const toggleBtn = document.createElement('button');
             toggleBtn.textContent = step.completed ? 'Mark Incomplete' : 'Mark Complete';
             toggleBtn.className = 'small-btn';
-            toggleBtn.addEventListener('click', () => {
+            toggleBtn.addEventListener('click', async () => {
+                if (window.isUserAuthenticated && window.isUserAuthenticated()) {
+                    try {
+                        await window.MomentumAPI.toggleStep(goal._id, step._id, !step.completed);
+                        await window.reloadData();
+                    } catch (err) { alert('Failed to toggle step: ' + err.message); }
+                    return;
+                }
                 const gs = loadData(STORAGE_KEYS.GOALS);
                 gs[gIndex].steps[sIndex].completed = !gs[gIndex].steps[sIndex].completed;
                 saveData(STORAGE_KEYS.GOALS, gs);
@@ -727,9 +747,17 @@ function renderGoals(data) {
             const editBtn = document.createElement('button');
             editBtn.className = 'small-btn';
             editBtn.textContent = 'Edit';
-            editBtn.addEventListener('click', () => {
+            editBtn.addEventListener('click', async () => {
                 const newTitle = prompt('Edit step title', step.title);
                 if (newTitle !== null && newTitle.trim()) {
+                    if (window.isUserAuthenticated && window.isUserAuthenticated()) {
+                        try {
+                            const updatedSteps = goal.steps.map((s, i) => i === sIndex ? { ...s, title: newTitle.trim() } : s);
+                            await window.MomentumAPI.updateGoal(goal._id, { steps: updatedSteps });
+                            await window.reloadData();
+                        } catch (err) { alert('Failed to edit step: ' + err.message); }
+                        return;
+                    }
                     const gs = loadData(STORAGE_KEYS.GOALS);
                     gs[gIndex].steps[sIndex].title = newTitle.trim();
                     saveData(STORAGE_KEYS.GOALS, gs);
@@ -741,8 +769,16 @@ function renderGoals(data) {
             const delBtn = document.createElement('button');
             delBtn.className = 'small-btn';
             delBtn.textContent = 'Delete';
-            delBtn.addEventListener('click', () => {
+            delBtn.addEventListener('click', async () => {
                 if (!confirm('Delete step?')) return;
+                if (window.isUserAuthenticated && window.isUserAuthenticated()) {
+                    try {
+                        const updatedSteps = goal.steps.filter((_, i) => i !== sIndex);
+                        await window.MomentumAPI.updateGoal(goal._id, { steps: updatedSteps });
+                        await window.reloadData();
+                    } catch (err) { alert('Failed to delete step: ' + err.message); }
+                    return;
+                }
                 const gs = loadData(STORAGE_KEYS.GOALS);
                 gs[gIndex].steps.splice(sIndex, 1);
                 saveData(STORAGE_KEYS.GOALS, gs);
@@ -765,9 +801,16 @@ function renderGoals(data) {
         const editGoalBtn = document.createElement('button');
         editGoalBtn.className = 'small-btn';
         editGoalBtn.textContent = 'Edit Goal Title';
-        editGoalBtn.addEventListener('click', () => {
+        editGoalBtn.addEventListener('click', async () => {
             const newTitle = prompt('Edit goal title', goal.title);
             if (newTitle !== null && newTitle.trim()) {
+                if (window.isUserAuthenticated && window.isUserAuthenticated()) {
+                    try {
+                        await window.MomentumAPI.updateGoal(goal._id, { title: newTitle.trim() });
+                        await window.reloadData();
+                    } catch (err) { alert('Failed to edit goal: ' + err.message); }
+                    return;
+                }
                 const gs = loadData(STORAGE_KEYS.GOALS);
                 gs[gIndex].title = newTitle.trim();
                 saveData(STORAGE_KEYS.GOALS, gs);
@@ -779,8 +822,15 @@ function renderGoals(data) {
         const delGoalBtn = document.createElement('button');
         delGoalBtn.className = 'small-btn';
         delGoalBtn.textContent = 'Delete Goal';
-        delGoalBtn.addEventListener('click', () => {
+        delGoalBtn.addEventListener('click', async () => {
             if (!confirm('Delete entire goal?')) return;
+            if (window.isUserAuthenticated && window.isUserAuthenticated()) {
+                try {
+                    await window.MomentumAPI.deleteGoal(goal._id);
+                    await window.reloadData();
+                } catch (err) { alert('Failed to delete goal: ' + err.message); }
+                return;
+            }
             const gs = loadData(STORAGE_KEYS.GOALS);
             gs.splice(gIndex, 1);
             saveData(STORAGE_KEYS.GOALS, gs);
