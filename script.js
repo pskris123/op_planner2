@@ -462,25 +462,35 @@ function renderPlanner(data) {
         const deleteBtn = document.createElement('button');
         deleteBtn.textContent = '×';
         deleteBtn.title = 'Delete event';
+        deleteBtn.style.zIndex = '100';
+        deleteBtn.style.position = 'relative';
         deleteBtn.onclick = e => {
             e.stopPropagation();
+            e.preventDefault();
             if (window.isUserAuthenticated && window.isUserAuthenticated()) {
-                // If authenticated, we'll let api-render handle it if we want,
-                // but for now let's just alert or let it be.
-                // Ideally we'd call window.MomentumAPI.deleteEvent(ev._id)
                 if (window.deleteEventFromAPI) window.deleteEventFromAPI(ev._id);
                 return;
             }
+            if (!confirm('Delete this event?')) return;
             const allEvents = loadData(STORAGE_KEYS.EVENTS);
-            const idx = allEvents.findIndex(item => JSON.stringify(item) === JSON.stringify(ev));
+            const idx = allEvents.findIndex(item =>
+                item.title === ev.title &&
+                item.day === ev.day &&
+                item.from === ev.from &&
+                item.to === ev.to
+            );
             if (idx > -1) {
                 allEvents.splice(idx, 1);
                 saveData(STORAGE_KEYS.EVENTS, allEvents);
+                events = allEvents;
+                window.events = allEvents;
                 renderPlanner();
                 updateDashboardWidgets();
             }
         };
         eventDiv.appendChild(deleteBtn);
+        // Elevate the slot's z-index so the event (and its delete button) aren't covered by later sibling slots
+        drawSlot.style.zIndex = '20';
         drawSlot.appendChild(eventDiv);
     });
 }
@@ -1032,7 +1042,6 @@ function updateDashboardWidgets(data) {
                         const ts = loadData(STORAGE_KEYS.FOCUS_TASKS);
                         ts[idx].title = newTitle.trim();
                         saveData(STORAGE_KEYS.FOCUS_TASKS, ts);
-                        renderFocusTasks();
                         updateDashboardWidgets();
                     }
                 }
@@ -1049,7 +1058,6 @@ function updateDashboardWidgets(data) {
                     const ts = loadData(STORAGE_KEYS.FOCUS_TASKS);
                     ts.splice(idx, 1);
                     saveData(STORAGE_KEYS.FOCUS_TASKS, ts);
-                    renderFocusTasks();
                     updateDashboardWidgets();
                 }
             };
@@ -1064,6 +1072,9 @@ function updateDashboardWidgets(data) {
     // Update global events variable
     window.events = allEvents;
     events = allEvents;
+
+    // Refresh AI suggestions
+    refreshAISuggestions();
 }
 
 /* --- Schedule Now functionality --- */
